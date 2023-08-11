@@ -14,17 +14,22 @@ axios.get('https://api.github.com/users/Darla-Young')
 
     Skip to STEP 3 (line 34).
 */
-  .then(response => {
-    console.log(response);
-  })
-  .catch(error => {
-    console.log(error);
-  });
+
+  // .then(response => {
+  //   console.log(response);
+  // })
 
 /*
   STEP 4: Pass the data received from Github into your function,
     and append the returned markup to the DOM as a child of .cards
 */
+  .then(response => {
+    console.log(response);
+    document.querySelector('.cards').append(createCard(response));
+  })
+  .catch(error => {
+    console.log('step 4: ' + error);
+  });
 
 /*
   STEP 5: Now that you have your own card getting added to the DOM, either
@@ -36,8 +41,25 @@ axios.get('https://api.github.com/users/Darla-Young')
     Using that array, iterate over it, requesting data for each user, creating a new card for each
     user, and adding that card to the DOM.
 */
-
 const followersArray = [];
+axios.get('https://api.github.com/users/Darla-Young/followers')
+  .then(response => {
+    response.data.forEach(follower => {
+      followersArray.push(follower.login);
+    });
+    followersArray.forEach(follower => {
+      axios.get(`https://api.github.com/users/${follower}`)
+        .then(response => {
+          document.querySelector('.cards').append(createCard(response));
+        })
+        .catch(error => {
+          console.log('step 5b: ' + error);
+        })
+    })
+  })
+  .catch(error => {
+    console.log('step 5a: ' + error);
+  });
 
 /*
   STEP 3: Create a function that accepts a single object as its only argument.
@@ -58,7 +80,7 @@ const followersArray = [];
       </div>
     </div>
 */
-const userCard = user => {
+const createCard = user => {
   const holder = document.createElement('div');
   const pic = document.createElement('img');
   const infoHolder = document.createElement('div');
